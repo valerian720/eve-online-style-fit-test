@@ -46,10 +46,16 @@
                 aria-label="Default select example"
                 v-for="slotIndex in range(slotAmout)"
                 :key="slotIndex"
+                @change="calcSelectedProcessedShip()"
+                v-model="
+                  selectedShip.usedSlots[
+                    summUpToIndex(selectedShip.slots, slotNumber) + slotIndex
+                  ]
+                "
               >
-                <option selected>Пустой модуль</option>
+                <option selected :value="{}">Пустой модуль</option>
                 <option
-                  value="1"
+                  :value="module"
                   v-for="(module, idex) in modules.filter(
                     (v) => v.slot == slotNumber + 1
                   )"
@@ -61,6 +67,13 @@
                 </option>
               </select>
             </div>
+            <button
+              type="button"
+              class="btn btn-primary p-1 m-1"
+              @click="resetActiveModules()"
+            >
+              Сброс
+            </button>
             <!--  -->
           </div>
         </div>
@@ -73,20 +86,96 @@
           <div class="card-body">
             <ul class="list-unstyled mt-3 mb-4" v-if="selectedShip != null">
               <li>Название: {{ splitCamelCase(selectedShip.name) }}</li>
-              <li>урон: {{ selectedShip.damage }}</li>
-              <li>прочность щита: {{ selectedShip.shield }}</li>
-              <li>прочность брони: {{ selectedShip.armor }}</li>
-              <li>прочность корпуса: {{ selectedShip.hull }}</li>
-              <li>
+              <li
+                :class="{
+                  'text-danger': selectedProcessedShip.damage < 0,
+                }"
+              >
+                урон: {{ selectedProcessedShip.damage }}
+              </li>
+              <li
+                :class="{
+                  'text-danger': selectedProcessedShip.shield < 0,
+                }"
+              >
+                прочность щита: {{ selectedProcessedShip.shield }}
+              </li>
+              <li
+                :class="{
+                  'text-danger': selectedProcessedShip.armor < 0,
+                }"
+              >
+                прочность брони: {{ selectedProcessedShip.armor }}
+              </li>
+              <li
+                :class="{
+                  'text-danger': selectedProcessedShip.hull < 0,
+                }"
+              >
+                прочность корпуса: {{ selectedProcessedShip.hull }}
+              </li>
+              <li
+                :class="{
+                  'text-danger':
+                    selectedProcessedShip.EnergyCreatingPerTick -
+                      selectedProcessedShip.energyUsingPerTick <
+                    0,
+                }"
+              >
                 скорость генерирования энергии:
+                {{ selectedProcessedShip.EnergyCreatingPerTick }} /
                 {{
-                  selectedShip.EnergyCreatingPerTick -
-                  selectedShip.energyUsingPerTick
+                  selectedProcessedShip.EnergyCreatingPerTick -
+                  selectedProcessedShip.energyUsingPerTick
                 }}
               </li>
-              <li>объем реактора: {{ selectedShip.reactor }}</li>
-              <li>объем CPU: {{ selectedShip.cpu }}</li>
+              <li
+                :class="{
+                  'text-danger':
+                    selectedProcessedShip.reactor -
+                      selectedProcessedShip.reactorUsed <
+                    0,
+                }"
+              >
+                объем реактора:
+                {{ selectedProcessedShip.reactor }}
+                /
+                {{
+                  selectedProcessedShip.reactor -
+                  selectedProcessedShip.reactorUsed
+                }}
+              </li>
+              <li
+                :class="{
+                  'text-danger':
+                    selectedProcessedShip.cpu - selectedProcessedShip.cpuUsed <
+                    0,
+                }"
+              >
+                объем CPU: {{ selectedProcessedShip.cpu }} /
+                {{ selectedProcessedShip.cpu - selectedProcessedShip.cpuUsed }}
+              </li>
             </ul>
+            <div class="row m-1 p-1" v-else>Неизвестно</div>
+          </div>
+        </div>
+        <div class="card mb-4 box-shadow" v-if="selectedShip != null">
+          <div class="card-header">
+            <h4 class="my-0 font-weight-normal">Итог</h4>
+          </div>
+          <div class="card-body">
+            <div class="row m-1 p-1">
+              Корабль: {{ splitCamelCase(selectedShip.name) }}
+            </div>
+            <div class="row m-1 p-1">
+              Модули:
+              {{
+                selectedShip.usedSlots
+                  .map((el) => splitCamelCase(el.name))
+                  .filter((el) => el != null)
+                  .join(", ")
+              }}
+            </div>
           </div>
         </div>
       </div>
@@ -144,6 +233,8 @@ export default {
       ships: [],
       //
       selectedShip: null,
+      //
+      selectedProcessedShip: {},
     };
   },
 
@@ -151,9 +242,34 @@ export default {
     this.populate();
   },
 
+  watch: {
+    // Note: only simple paths. Expressions are not supported.
+    selectedShip(newValue) {
+      this.selectedProcessedShip = { ...newValue };
+    },
+  },
+
   methods: {
+    calcSelectedProcessedShip() {
+      this.selectedProcessedShip = { ...this.selectedShip };
+      for (const slotIndex in this.selectedProcessedShip.usedSlots) {
+        const curModule = this.selectedProcessedShip.usedSlots[slotIndex];
+        if (curModule != {})
+          for (const curModuleKey in curModule) {
+            // apply += to keys from modules to ship
+            if (curModuleKey in this.selectedProcessedShip) {
+              this.selectedProcessedShip[curModuleKey] +=
+                curModule[curModuleKey];
+            }
+          }
+      }
+    },
     splitCamelCase(text) {
-      return text.replace(/([A-Z])/g, " $1").toLowerCase();
+      var ret = null;
+      if (text != null) {
+        ret = text.replace(/([A-Z])/g, " $1").toLowerCase();
+      }
+      return ret;
     },
     range(size, startAt = 0) {
       return [...Array(size).keys()].map((i) => i + startAt);
@@ -188,13 +304,24 @@ export default {
       var ret = [];
       for (const key in curModule) {
         if (!exclude.includes(key)) {
-          ret.push(`${this.translate(key)}: ${curModule[key]}`);
+          if (curModule[key] !== 0) {
+            ret.push(`${this.translate(key)}: ${curModule[key]}`);
+          }
         }
       }
       return ret.join(", ");
     },
+    summUpToIndex(arr, index) {
+      return arr.reduce((a, b, i) => (i < index ? a + b : a), 0);
+    },
     translate(text) {
       return this.translations[text];
+    },
+    resetActiveModules() {
+      this.selectedShip.usedSlots = new Array(
+        this.selectedShip.slots.reduce((a, b) => a + b, 0)
+      ).fill({});
+      this.selectedProcessedShip = { ...this.selectedShip };
     },
     populate() {
       this.modules = [
@@ -288,6 +415,10 @@ export default {
           slots: [1, 2, 2],
         },
       ];
+      //
+      this.ships.map((v) => {
+        v.usedSlots = new Array(v.slots.reduce((a, b) => a + b, 0)).fill({});
+      });
     },
   },
 };
@@ -295,107 +426,3 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less"></style>
-<!-- 
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-
-// i need a class to store stats
-class Armor {
-  name: string;
-  healthBoost: number;
-  damageBoost: number;
-  speedBoost: number;
-
-  amountSelected: number;
-
-  constructor(
-    name: string,
-    healthBoost: number,
-    damageBoost: number,
-    speedBoost: number
-  ) {
-    this.amountSelected = 0;
-    this.name = name;
-    //
-    [this.healthBoost, this.damageBoost, this.speedBoost] = [
-      healthBoost,
-      damageBoost,
-      speedBoost,
-    ];
-  }
-
-  IncreaseCount(): void {
-    this.amountSelected++;
-  }
-
-  DecreaseCount(): void {
-    if (this.amountSelected > 0) this.amountSelected--;
-  }
-}
-
-// i need target class that will calculate target stats
-class Stats {
-  totalPoints = 100;
-
-  calc(armorList: Array<Armor>): {
-    healthBoost: number;
-    damageBoost: number;
-    speedBoost: number;
-  } {
-    let tmp = { healthBoost: 1, damageBoost: 1, speedBoost: 1 };
-
-    for (let armor of armorList) {
-      tmp.healthBoost += armor.healthBoost * armor.amountSelected;
-      tmp.damageBoost += armor.damageBoost * armor.amountSelected;
-      tmp.speedBoost += armor.speedBoost * armor.amountSelected;
-    }
-
-    let sum = tmp.damageBoost + tmp.healthBoost + tmp.speedBoost;
-
-    tmp.healthBoost = (tmp.healthBoost / sum) * this.totalPoints;
-    tmp.damageBoost = (tmp.damageBoost / sum) * this.totalPoints;
-    tmp.speedBoost = (tmp.speedBoost / sum) * this.totalPoints;
-
-    return tmp;
-  }
-}
-
-//
-@Options({
-  props: {
-    msg: String,
-  },
-})
-//
-export default class HelloWorld extends Vue {
-  // state
-  armor!: Array<Armor>;
-  statistics!: Stats;
-
-  displayedStatistics = {
-    healthBoost: 100 / 3,
-    damageBoost: 100 / 3,
-    speedBoost: 100 / 3,
-  };
-
-  // state (props)
-  msg!: string;
-
-  // functions
-  data(): { armor: Array<Armor>; statistics: Stats } {
-    return {
-      armor: [
-        new Armor("alfa", 1, 2, 1),
-        new Armor("beta", 0, 0, 2),
-        new Armor("gamma", 0, 2, 0),
-        new Armor("delta", 3, 0, 0),
-      ],
-      statistics: new Stats(),
-    };
-  }
-
-  clickMe(): void {
-    this.displayedStatistics = this.statistics.calc(this.armor);
-  }
-}
-</script> -->
