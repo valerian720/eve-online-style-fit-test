@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkeve_online_style_fit_test"]=self["webpackChunkeve_online_style_fit_test"]||[]).push([[443],{7381:function(e,t,n){n.r(t),n.d(t,{default:function(){return _}});var s=n(3396);const u={class:"about"},i=(0,s._)("h1",null,"This is an about page",-1),a=[i];function r(e,t){return(0,s.wg)(),(0,s.iD)("div",u,a)}var l=n(89);const c={},o=(0,l.Z)(c,[["render",r]]);var _=o}}]);
+//# sourceMappingURL=about.9df68b91.js.map
