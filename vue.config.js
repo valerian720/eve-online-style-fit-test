@@ -1,6 +1,7 @@
 const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
-  publicPath: process.env.NODE_ENV === "production" ? "/REPO_NAME/" : "/",
+  publicPath:
+    process.env.NODE_ENV === "production" ? "/eve-online-style-fit-test/" : "/",
   transpileDependencies: true,
   // auto fix on save
   chainWebpack: (config) => {
