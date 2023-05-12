@@ -6,6 +6,7 @@
         Выберите в левой колонке пункты в слоты что бы в правой колонке появился
         итоговый балланс корабля
       </p>
+      <p>что бы измениь/добавить модули/корабли нажмите здесь</p>
     </div>
 
     <div class="row m-5 p-1">
@@ -179,15 +180,25 @@
           </div>
         </div>
       </div>
+      <ObjectCreator
+        v-if="selectedShip"
+        @obj-changed="calcSelectedProcessedShip"
+        :constructable="selectedShip"
+      />
     </div>
   </div>
 </template>
 
 <script>
+import ObjectCreator from "@/components/ObjectCreator.vue";
+
 export default {
   name: "FitComponent",
   props: {
     msg: String,
+  },
+  components: {
+    ObjectCreator,
   },
 
   data() {
@@ -243,7 +254,6 @@ export default {
   },
 
   watch: {
-    // Note: only simple paths. Expressions are not supported.
     selectedShip(newValue) {
       this.selectedProcessedShip = { ...newValue };
     },
