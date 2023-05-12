@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-1 m-1">
     <div
       class="card"
       @drop.prevent="onDrop"
@@ -7,7 +7,7 @@
       @dragenter.prevent
     >
       <div class="card-body">
-        <h4 class="card-title">Редактор</h4>
+        <h4 class="card-title">Редактор {{ name }}</h4>
         <div
           class="row g-3 align-items-center py-1"
           v-for="field in Object.keys(constructable).filter(
@@ -80,6 +80,7 @@ export default {
   name: "ObjectCreator",
   props: {
     constructable: Object,
+    name: String,
   },
   emits: ["objChanged"],
 

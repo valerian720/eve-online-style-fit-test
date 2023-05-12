@@ -29,55 +29,57 @@
             <!--  -->
           </div>
         </div>
-        <div class="card mb-4 box-shadow" v-if="selectedShip != null">
-          <div class="card-header">
-            <h4 class="my-0 font-weight-normal">
-              Слоты корабля (выбор модулей)
-            </h4>
-          </div>
-          <div class="card-body">
-            <div
-              class="row m-1 p-1"
-              v-for="(slotAmout, slotNumber) in selectedShip.slots"
-              :key="slotNumber"
-            >
-              <p class="h4">слот {{ romanize(slotNumber + 1) }}</p>
-              <select
-                class="form-select mb-2"
-                aria-label="Default select example"
-                v-for="slotIndex in range(slotAmout)"
-                :key="slotIndex"
-                @change="calcSelectedProcessedShip()"
-                v-model="
-                  selectedShip.usedSlots[
-                    summUpToIndex(selectedShip.slots, slotNumber) + slotIndex
-                  ]
-                "
-              >
-                <option selected :value="{}">Пустой модуль</option>
-                <option
-                  :value="module"
-                  v-for="(module, idex) in modules.filter(
-                    (v) => v.slot == slotNumber + 1
-                  )"
-                  :key="idex"
-                >
-                  {{ splitCamelCase(module.name) }} ({{
-                    moduleToString(module)
-                  }})
-                </option>
-              </select>
+        <Transition name="bounce">
+          <div class="card mb-4 box-shadow" v-if="selectedShip != null">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">
+                Слоты корабля (выбор модулей)
+              </h4>
             </div>
-            <button
-              type="button"
-              class="btn btn-primary p-1 m-1"
-              @click="resetActiveModules()"
-            >
-              Сброс
-            </button>
-            <!--  -->
+            <div class="card-body">
+              <div
+                class="row m-1 p-1"
+                v-for="(slotAmout, slotNumber) in selectedShip.slots"
+                :key="slotNumber"
+              >
+                <p class="h4">слот {{ romanize(slotNumber + 1) }}</p>
+                <select
+                  class="form-select mb-2"
+                  aria-label="Default select example"
+                  v-for="slotIndex in range(slotAmout)"
+                  :key="slotIndex"
+                  @change="calcSelectedProcessedShip()"
+                  v-model="
+                    selectedShip.usedSlots[
+                      summUpToIndex(selectedShip.slots, slotNumber) + slotIndex
+                    ]
+                  "
+                >
+                  <option selected :value="{}">Пустой модуль</option>
+                  <option
+                    :value="module"
+                    v-for="(module, idex) in modules.filter(
+                      (v) => v.slot == slotNumber + 1
+                    )"
+                    :key="idex"
+                  >
+                    {{ splitCamelCase(module.name) }} ({{
+                      moduleToString(module)
+                    }})
+                  </option>
+                </select>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary p-1 m-1"
+                @click="resetActiveModules()"
+              >
+                Сброс
+              </button>
+              <!--  -->
+            </div>
           </div>
-        </div>
+        </Transition>
       </div>
       <div class="col m-1 p-1">
         <div class="card mb-4 box-shadow">
@@ -85,106 +87,150 @@
             <h4 class="my-0 font-weight-normal">Итоговый баланс</h4>
           </div>
           <div class="card-body">
-            <ul class="list-unstyled mt-3 mb-4" v-if="selectedShip != null">
-              <li>Название: {{ splitCamelCase(selectedShip.name) }}</li>
-              <li
-                :class="{
-                  'text-danger': selectedProcessedShip.damage < 0,
-                }"
-              >
-                урон: {{ selectedProcessedShip.damage }}
-              </li>
-              <li
-                :class="{
-                  'text-danger': selectedProcessedShip.shield < 0,
-                }"
-              >
-                прочность щита: {{ selectedProcessedShip.shield }}
-              </li>
-              <li
-                :class="{
-                  'text-danger': selectedProcessedShip.armor < 0,
-                }"
-              >
-                прочность брони: {{ selectedProcessedShip.armor }}
-              </li>
-              <li
-                :class="{
-                  'text-danger': selectedProcessedShip.hull < 0,
-                }"
-              >
-                прочность корпуса: {{ selectedProcessedShip.hull }}
-              </li>
-              <li
-                :class="{
-                  'text-danger':
+            <Transition name="fade" mode="out-in">
+              <ul class="list-unstyled mt-3 mb-4" v-if="selectedShip != null">
+                <li>Название: {{ splitCamelCase(selectedShip.name) }}</li>
+                <li
+                  :class="{
+                    'text-danger': selectedProcessedShip.damage < 0,
+                  }"
+                >
+                  урон: {{ selectedProcessedShip.damage }}
+                </li>
+                <li
+                  :class="{
+                    'text-danger': selectedProcessedShip.shield < 0,
+                  }"
+                >
+                  прочность щита: {{ selectedProcessedShip.shield }}
+                </li>
+                <li
+                  :class="{
+                    'text-danger': selectedProcessedShip.armor < 0,
+                  }"
+                >
+                  прочность брони: {{ selectedProcessedShip.armor }}
+                </li>
+                <li
+                  :class="{
+                    'text-danger': selectedProcessedShip.hull < 0,
+                  }"
+                >
+                  прочность корпуса: {{ selectedProcessedShip.hull }}
+                </li>
+                <li
+                  :class="{
+                    'text-danger':
+                      selectedProcessedShip.EnergyCreatingPerTick -
+                        selectedProcessedShip.energyUsingPerTick <
+                      0,
+                  }"
+                >
+                  скорость генерирования энергии:
+                  {{ selectedProcessedShip.EnergyCreatingPerTick }} /
+                  {{
                     selectedProcessedShip.EnergyCreatingPerTick -
-                      selectedProcessedShip.energyUsingPerTick <
-                    0,
-                }"
-              >
-                скорость генерирования энергии:
-                {{ selectedProcessedShip.EnergyCreatingPerTick }} /
-                {{
-                  selectedProcessedShip.EnergyCreatingPerTick -
-                  selectedProcessedShip.energyUsingPerTick
-                }}
-              </li>
-              <li
-                :class="{
-                  'text-danger':
+                    selectedProcessedShip.energyUsingPerTick
+                  }}
+                </li>
+                <li
+                  :class="{
+                    'text-danger':
+                      selectedProcessedShip.reactor -
+                        selectedProcessedShip.reactorUsed <
+                      0,
+                  }"
+                >
+                  объем реактора:
+                  {{ selectedProcessedShip.reactor }}
+                  /
+                  {{
                     selectedProcessedShip.reactor -
-                      selectedProcessedShip.reactorUsed <
-                    0,
-                }"
-              >
-                объем реактора:
-                {{ selectedProcessedShip.reactor }}
-                /
-                {{
-                  selectedProcessedShip.reactor -
-                  selectedProcessedShip.reactorUsed
-                }}
-              </li>
-              <li
-                :class="{
-                  'text-danger':
-                    selectedProcessedShip.cpu - selectedProcessedShip.cpuUsed <
-                    0,
-                }"
-              >
-                объем CPU: {{ selectedProcessedShip.cpu }} /
-                {{ selectedProcessedShip.cpu - selectedProcessedShip.cpuUsed }}
-              </li>
-            </ul>
-            <div class="row m-1 p-1" v-else>Неизвестно</div>
+                    selectedProcessedShip.reactorUsed
+                  }}
+                </li>
+                <li
+                  :class="{
+                    'text-danger':
+                      selectedProcessedShip.cpu -
+                        selectedProcessedShip.cpuUsed <
+                      0,
+                  }"
+                >
+                  объем CPU: {{ selectedProcessedShip.cpu }} /
+                  {{
+                    selectedProcessedShip.cpu - selectedProcessedShip.cpuUsed
+                  }}
+                </li>
+              </ul>
+              <div class="row m-1 p-1" v-else>Неизвестно</div>
+            </Transition>
           </div>
         </div>
-        <div class="card mb-4 box-shadow" v-if="selectedShip != null">
-          <div class="card-header">
-            <h4 class="my-0 font-weight-normal">Итог</h4>
+        <Transition name="fade">
+          <div class="card mb-4 box-shadow" v-if="selectedShip != null">
+            <div class="card-header">
+              <h4 class="my-0 font-weight-normal">Итог</h4>
+            </div>
+            <div class="card-body">
+              <div class="row m-1 p-1">
+                Корабль: {{ splitCamelCase(selectedShip.name) }}
+              </div>
+              <div class="row m-1 p-1">
+                Модули:
+                {{
+                  selectedShip.usedSlots
+                    .map((el) => splitCamelCase(el.name))
+                    .filter((el) => el != null)
+                    .join(", ")
+                }}
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <div class="row m-1 p-1">
-              Корабль: {{ splitCamelCase(selectedShip.name) }}
-            </div>
-            <div class="row m-1 p-1">
-              Модули:
-              {{
-                selectedShip.usedSlots
-                  .map((el) => splitCamelCase(el.name))
-                  .filter((el) => el != null)
-                  .join(", ")
-              }}
-            </div>
+        </Transition>
+      </div>
+      <div class="row m-1 p-1" v-if="selectedShip">
+        <p>
+          <a
+            class="btn btn-primary"
+            data-bs-toggle="collapse"
+            href="#changeSelectedShip"
+            aria-expanded="false"
+            aria-controls="changeSelectedShip"
+          >
+            Изменить корабль
+          </a>
+        </p>
+        <div class="collapse" id="changeSelectedShip">
+          <ObjectCreator
+            @obj-changed="calcSelectedProcessedShip"
+            :constructable="selectedShip"
+            :name="'выбранного корабля'"
+          />
+        </div>
+      </div>
+      <div class="row m-1 p-1">
+        <p>
+          <a
+            class="btn btn-primary"
+            data-bs-toggle="collapse"
+            href="#changeModules"
+            aria-expanded="false"
+            aria-controls="changeModules"
+          >
+            Изменить Модули
+          </a>
+        </p>
+        <div class="collapse" id="changeModules">
+          <div class="row" v-for="(curModule, index) in modules" :key="index">
+            <ObjectCreator
+              @obj-changed="calcSelectedProcessedShip"
+              :constructable="curModule"
+              :name="`модуля ${curModule.name}`"
+            />
           </div>
         </div>
       </div>
-      <ObjectCreator
-        v-if="selectedShip"
-        @obj-changed="calcSelectedProcessedShip"
-        :constructable="selectedShip"
-      />
     </div>
   </div>
 </template>
@@ -435,4 +481,31 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
