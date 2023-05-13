@@ -15,10 +15,10 @@
           )"
           :key="field"
         >
-          <div class="col-auto">
-            <label class="col-form-label">{{ field }}</label>
+          <div class="col-3">
+            <p class="col-form-label text-end">{{ field }}</p>
           </div>
-          <div class="col-auto">
+          <div class="col-6">
             <input
               v-if="typeof constructable[field] == 'number'"
               class="form-control"
@@ -113,9 +113,7 @@ export default {
     fileUploaded() {
       var reader = new FileReader();
       reader.onload = (e) => {
-        console.log(e.target.result);
         let json = JSON.parse(e.target.result);
-        console.log(json);
         this.applyChangesToConstructable(json);
       };
       if (this.$refs.file.files.length > 0) {
@@ -131,7 +129,6 @@ export default {
       for (const newFieldIndex in fields) {
         let newField = fields[newFieldIndex];
         this.constructable[newField] = newObj[newField];
-        console.log(this.constructable[newField], newField);
       }
       this.changeField();
     },

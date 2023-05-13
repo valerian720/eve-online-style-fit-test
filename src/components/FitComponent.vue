@@ -203,7 +203,7 @@
         </p>
         <div class="collapse" id="changeSelectedShip">
           <ObjectCreator
-            @obj-changed="calcSelectedProcessedShip"
+            @obj-changed="processImportedShip"
             :constructable="selectedShip"
             :name="'выбранного корабля'"
           />
@@ -306,6 +306,82 @@ export default {
   },
 
   methods: {
+    registerShipModules() {
+      console.log("registerShipModules");
+      let unregNewModules = this.selectedShip.usedSlots;
+      for (const unregModuleIndex in unregNewModules) {
+        let unregModule = unregNewModules[unregModuleIndex];
+        if (
+          unregModule.name != undefined &&
+          !this.modules.includes(unregModule)
+        ) {
+          this.modules.push(unregModule);
+        }
+      }
+    },
+    cleanupRegisteredModules() {
+      console.log("cleanupRegisteredModules");
+      let haveSeen = new Set();
+      let listToDelete = [];
+      for (const moduleIndex in this.modules) {
+        let curModule = this.modules[moduleIndex];
+        let curModuleJson = JSON.stringify(curModule);
+        if (
+          this.modules.filter((v) => JSON.stringify(v) === curModuleJson)
+            .length > 0
+        ) {
+          if (haveSeen.has(curModuleJson)) {
+            listToDelete.push(curModule);
+          } else {
+            haveSeen.add(curModuleJson);
+          }
+        }
+      }
+      this.modules = this.modules.filter((el) => !listToDelete.includes(el));
+    },
+    markDuplicateModules() {
+      let haveSeen = {};
+      for (const moduleIndex in this.modules) {
+        let curModule = this.modules[moduleIndex];
+        if (this.modules.filter((v) => v.name === curModule.name).length > 0) {
+          let suffix = "";
+          if (haveSeen[curModule.name] == undefined) {
+            haveSeen[curModule.name] = 1;
+          } else {
+            suffix = "*".repeat(haveSeen[curModule.name]);
+            haveSeen[curModule.name] += 1;
+          }
+          curModule.name += suffix;
+        }
+      }
+    },
+    cleanupSelectedShipModules() {
+      console.log("cleanupSelectedShipModules");
+      console.log(JSON.stringify(this.modules));
+      let curModules = this.selectedShip.usedSlots;
+      for (const curModuleIndex in curModules) {
+        let curModule = curModules[curModuleIndex];
+        let curModuleJson = JSON.stringify(curModule);
+        let replacingModule = this.modules.filter(
+          (v) => JSON.stringify(v) === curModuleJson
+        );
+        console.log(replacingModule);
+        if (replacingModule.length > 0) {
+          this.selectedShip.usedSlots[curModuleIndex] = replacingModule[0];
+        }
+      }
+    },
+    processImportedShip() {
+      // add new
+      this.registerShipModules();
+      // cleanup
+      this.cleanupRegisteredModules();
+      this.cleanupSelectedShipModules();
+      // this.markDuplicateModules();
+      // sync recalc values
+      this.calcSelectedProcessedShip();
+    },
+
     calcSelectedProcessedShip() {
       this.selectedProcessedShip = { ...this.selectedShip };
       for (const slotIndex in this.selectedProcessedShip.usedSlots) {
