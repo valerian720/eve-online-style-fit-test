@@ -321,6 +321,10 @@ export default {
   },
 
   methods: {
+    /**
+     * copy template object to create new ship
+     * @return {none}
+     */
     addNewShip() {
       let newShip = { ...this.shipsDefaults };
       newShip.name = "new ship";
@@ -330,9 +334,17 @@ export default {
       this.resetActiveModules();
       this.calcSelectedProcessedShip();
     },
+    /**
+     * copy template object to create new module
+     * @return {none}
+     */
     addnewModule() {
       this.modules.push({ ...this.modulesDefaults });
     },
+    /**
+     * search and remember new modules on selectedShip
+     * @return {none}
+     */
     registerShipModules() {
       console.log("registerShipModules");
       let unregNewModules = this.selectedShip.usedSlots;
@@ -346,6 +358,10 @@ export default {
         }
       }
     },
+    /**
+     * search and remove duplicate modules, that are not ref of one another
+     * @return {none}
+     */
     cleanupRegisteredModules() {
       console.log("cleanupRegisteredModules");
       let haveSeen = new Set();
@@ -366,6 +382,10 @@ export default {
       }
       this.modules = this.modules.filter((el) => !listToDelete.includes(el));
     },
+    /**
+     * search duplicate modules by name, and add star symball near name (not used)
+     * @return {none}
+     */
     markDuplicateModules() {
       let haveSeen = {};
       for (const moduleIndex in this.modules) {
@@ -382,6 +402,10 @@ export default {
         }
       }
     },
+    /**
+     * on selectedShip replace modules obj to links of modules from this.modules
+     * @return {none}
+     */
     cleanupSelectedShipModules() {
       console.log("cleanupSelectedShipModules");
       console.log(JSON.stringify(this.modules));
@@ -398,6 +422,10 @@ export default {
         }
       }
     },
+    /**
+     * sync and cleanup imported object from file
+     * @return {none}
+     */
     processImportedShip() {
       // add new
       this.registerShipModules();
@@ -408,7 +436,10 @@ export default {
       // sync recalc values
       this.calcSelectedProcessedShip();
     },
-
+    /**
+     * recalculate affection of modules to ship by creating a copy and mutating it
+     * @return {none}
+     */
     calcSelectedProcessedShip() {
       this.selectedProcessedShip = { ...this.selectedShip };
       for (const slotIndex in this.selectedProcessedShip.usedSlots) {
@@ -423,6 +454,11 @@ export default {
           }
       }
     },
+    /**
+     * converts CamelCase string to readable text
+     * @param {String} text - input string without spaces in camelCase
+     * @return {String} human readable string based on the parameter
+     */
     splitCamelCase(text) {
       var ret = null;
       if (text != null) {
@@ -430,9 +466,20 @@ export default {
       }
       return ret;
     },
+    /**
+     * python like range of int numbers creation
+     * @param {Number} size - size of output array
+     * @param {Number} startAt - start value of range
+     * @return {Array} range of int numbers from startAt to startAt + size
+     */
     range(size, startAt = 0) {
       return [...Array(size).keys()].map((i) => i + startAt);
     },
+    /**
+     * convert number to romanian representation
+     * @param {Number} num - just a number
+     * @return {String} romanian representation of input string
+     */
     romanize(num) {
       var lookup = {
           M: 1000,
@@ -459,6 +506,12 @@ export default {
       }
       return roman;
     },
+    /**
+     * convert module to string
+     * @param {Object} curModule - module type object
+     * @param {List} exclude - List of fields name that to exclude
+     * @return {String} curModule text representation
+     */
     moduleToString(curModule, exclude = ["name", "slot"]) {
       var ret = [];
       for (const key in curModule) {
@@ -470,18 +523,37 @@ export default {
       }
       return ret.join(", ");
     },
+    /**
+     * summ of elements of array from start to index
+     * @param {Object} arr - List of Numbers
+     * @param {Number} index - end index
+     * @return {Number} summ
+     */
     summUpToIndex(arr, index) {
       return arr.reduce((a, b, i) => (i < index ? a + b : a), 0);
     },
+    /**
+     * Lookup to translation table
+     * @param {String} text - text
+     * @return {String} translated text
+     */
     translate(text) {
       return this.translations[text];
     },
+    /**
+     * set all slots of selectedShip and selectedProcessedShip to empty objects
+     * @return {none}
+     */
     resetActiveModules() {
       this.selectedShip.usedSlots = new Array(
         this.selectedShip.slots.reduce((a, b) => a + b, 0)
       ).fill({});
       this.selectedProcessedShip = { ...this.selectedShip };
     },
+    /**
+     * initial ship and modules
+     * @return {none}
+     */
     populate() {
       this.modules = [
         {
