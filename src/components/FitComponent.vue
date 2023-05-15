@@ -6,7 +6,6 @@
         Выберите в левой колонке пункты в слоты что бы в правой колонке появился
         итоговый балланс корабля
       </p>
-      <p>что бы измениь/добавить модули/корабли нажмите здесь</p>
     </div>
 
     <div class="row m-5 p-1">
@@ -17,7 +16,7 @@
           </div>
           <div class="card-body">
             <select
-              class="form-select"
+              class="form-select mb-3"
               v-model="selectedShip"
               aria-label="Default select example"
             >
@@ -27,6 +26,22 @@
               </option>
             </select>
             <!--  -->
+            <div class="col">
+              <button
+                type="button"
+                @click="addNewShip()"
+                class="btn btn-primary m-1 p-1"
+              >
+                Добавить корабль <span class="badge bg-primary">+</span>
+              </button>
+              <button
+                type="button"
+                @click="addnewModule()"
+                class="btn btn-primary m-1 p-1"
+              >
+                Добавить модуль <span class="badge bg-primary">+</span>
+              </button>
+            </div>
           </div>
         </div>
         <Transition name="bounce">
@@ -272,7 +287,7 @@ export default {
         reactor: 100,
         cpu: 100,
         //
-        slots: [3, 3, 2],
+        slots: [3, 3, 4],
       },
       modulesDefaults: {
         name: "ModuleDefaults",
@@ -306,6 +321,18 @@ export default {
   },
 
   methods: {
+    addNewShip() {
+      let newShip = { ...this.shipsDefaults };
+      newShip.name = "new ship";
+      this.ships.push(newShip);
+      //
+      this.selectedShip = newShip;
+      this.resetActiveModules();
+      this.calcSelectedProcessedShip();
+    },
+    addnewModule() {
+      this.modules.push({ ...this.modulesDefaults });
+    },
     registerShipModules() {
       console.log("registerShipModules");
       let unregNewModules = this.selectedShip.usedSlots;
