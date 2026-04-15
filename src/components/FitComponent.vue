@@ -30,16 +30,16 @@
               <button
                 type="button"
                 @click="addNewShip()"
-                class="btn btn-primary m-1 p-1"
+                class="btn btn-success m-1 p-1"
               >
-                Добавить корабль <span class="badge bg-primary">+</span>
+                Добавить корабль <span class="badge bg-success">+</span>
               </button>
               <button
                 type="button"
                 @click="addnewModule()"
-                class="btn btn-primary m-1 p-1"
+                class="btn btn-success m-1 p-1"
               >
-                Добавить модуль <span class="badge bg-primary">+</span>
+                Добавить модуль <span class="badge bg-success">+</span>
               </button>
             </div>
           </div>
@@ -86,7 +86,7 @@
               </div>
               <button
                 type="button"
-                class="btn btn-primary p-1 m-1"
+                class="btn btn-success p-1 m-1"
                 @click="resetActiveModules()"
               >
                 Сброс
@@ -207,7 +207,7 @@
       <div class="row m-1 p-1" v-if="selectedShip">
         <p>
           <a
-            class="btn btn-primary"
+            class="btn btn-warning"
             data-bs-toggle="collapse"
             href="#changeSelectedShip"
             aria-expanded="false"
@@ -227,7 +227,7 @@
       <div class="row m-1 p-1">
         <p>
           <a
-            class="btn btn-primary"
+            class="btn btn-warning"
             data-bs-toggle="collapse"
             href="#changeModules"
             aria-expanded="false"
@@ -658,17 +658,17 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 .bounce-enter-active {
-  animation: bounce-in 0.5s;
+  animation: bounce-in 0.3s;
 }
 .bounce-leave-active {
-  animation: bounce-in 0.5s reverse;
+  animation: bounce-in 0.3s reverse;
 }
 @keyframes bounce-in {
   0% {
     transform: scale(0);
   }
   50% {
-    transform: scale(1.25);
+    transform: scale(1.1);
   }
   100% {
     transform: scale(1);
@@ -676,7 +676,7 @@ export default {
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,
