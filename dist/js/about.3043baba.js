@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkeve_online_style_fit_test"]=self["webpackChunkeve_online_style_fit_test"]||[]).push([[594],{3223:function(e,t,n){n.r(t),n.d(t,{default:function(){return f}});var s=n(6768);const u={class:"about"},a=(0,s.Lk)("h1",null,"This is an about page",-1),i=[a];function r(e,t){return(0,s.uX)(),(0,s.CE)("div",u,i)}var l=n(1241);const c={},o=(0,l.A)(c,[["render",r]]);var f=o}}]);
+//# sourceMappingURL=about.3043baba.js.map
