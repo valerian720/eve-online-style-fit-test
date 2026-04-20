@@ -226,6 +226,59 @@
       </div>
       <div class="row m-1 p-1">
         <p>
+          <button
+            type="button"
+            class="btn btn-warning"
+            data-bs-toggle="modal"
+            data-bs-target="#editModal"
+          >
+            Изменить Модули
+          </button>
+        </p>
+
+        <!-- Modal -->
+        <div
+          class="modal fade"
+          id="editModal"
+          tabindex="-1"
+          aria-labelledby="editModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h2 class="modal-title fs-5" id="editModalLabel">Редактор</h2>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div class="modal-body">
+                <div class="container-fluid">
+                  <div class="row">
+                    <div class="col-12" id="changeModules">
+                      <div
+                        class="row"
+                        v-for="(curModule, index) in modules"
+                        :key="index"
+                      >
+                        <ObjectCreator
+                          @obj-changed="calcSelectedProcessedShip"
+                          :constructable="curModule"
+                          :name="`модуля ${curModule.name}`"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- <p>
           <a
             class="btn btn-warning"
             data-bs-toggle="collapse"
@@ -244,7 +297,7 @@
               :name="`модуля ${curModule.name}`"
             />
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
